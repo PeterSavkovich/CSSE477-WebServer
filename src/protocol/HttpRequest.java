@@ -58,6 +58,10 @@ public abstract class HttpRequest implements IHttpRequest {
 	public String getUri() {
 		return uri;
 	}
+	
+	public void setUri(String newUri) {
+		this.uri = newUri;
+	}
 
 	/**
 	 * The version of the http request.

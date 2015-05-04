@@ -26,13 +26,17 @@
  * http://clarkson.edu/~rupakhcr
  */
  
-package protocol;
+package responses;
 
 import java.io.File;
 import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.util.Date;
 import java.util.HashMap;
+
+import protocol.HttpResponse;
+import protocol.HttpResponseFactory;
+import protocol.Protocol;
 
 /**
  * 
