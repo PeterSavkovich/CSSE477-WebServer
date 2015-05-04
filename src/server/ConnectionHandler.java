@@ -130,7 +130,7 @@ public class ConnectionHandler implements Runnable {
 				else {
 					// TODO: Get the root context from the request.
 					//response = request.handleRequest(server);
-					response = (HttpResponse) this.pluginHandler.processRequest(request);
+					response = (HttpResponse) this.pluginHandler.processRequest(request, server);
 				}
 			}
 			catch(Exception e) {

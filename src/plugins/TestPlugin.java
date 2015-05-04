@@ -1,5 +1,5 @@
 /*
- * IPlugin.java
+ * TestPlugin.java
  * May 3, 2015
  *
  * Simple Web Server (SWS) for EE407/507 and CS455/555
@@ -26,20 +26,40 @@
  * http://clarkson.edu/~rupakhcr
  */
  
-package server;
+package plugins;
 
 import protocol.IHttpRequest;
 import protocol.IHttpResponse;
 import protocol.IServer;
+import server.IPlugin;
 
 /**
  * 
  * @author Chandan R. Rupakheti (rupakhcr@clarkson.edu)
  */
-public interface IPlugin {
+public class TestPlugin implements IPlugin {
 
-	public String getRootContext();
-	
-	public IHttpResponse processRequest(IHttpRequest request, IServer server) throws Exception;
+	/**
+	 * 
+	 */
+	public TestPlugin() {
+		// TODO Auto-generated constructor stub
+	}
+
+	/* (non-Javadoc)
+	 * @see server.IPlugin#getRootContext()
+	 */
+	@Override
+	public String getRootContext() {
+		return "TestPlugin";
+	}
+
+	/* (non-Javadoc)
+	 * @see server.IPlugin#processRequest(protocol.IHttpRequest)
+	 */
+	@Override
+	public IHttpResponse processRequest(IHttpRequest request, IServer server) throws Exception {
+		return request.handleRequest(server);
+	}
 
 }

@@ -96,14 +96,14 @@ public class PluginHandler {
 	}
 	
 	// TODO: Make this exception not stupid.
-	public IHttpResponse processRequest(IHttpRequest request) throws Exception {
+	public IHttpResponse processRequest(IHttpRequest request, Server server) throws Exception {
 		String rootContext = pullRootContextFromURI(request.getUri());
 		IPlugin plugin = plugins.get(rootContext);
 		if (plugin != null) {
-			return plugin.processRequest(request);
+			return plugin.processRequest(request, server);
 		} else {
 			if (tryPlugin(rootContext)) {
-				return plugins.get(rootContext).processRequest(request);
+				return plugins.get(rootContext).processRequest(request, server);
 			} else {
 				throw new Exception();
 			}
