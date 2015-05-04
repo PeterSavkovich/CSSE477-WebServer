@@ -1,5 +1,5 @@
 /*
- * NotFound404Response.java
+ * NotSupported505Response.java
  * Apr 27, 2015
  *
  * Simple Web Server (SWS) for EE407/507 and CS455/555
@@ -26,22 +26,26 @@
  * http://clarkson.edu/~rupakhcr
  */
  
-package protocol;
+package responses;
 
 import java.util.HashMap;
+
+import protocol.HttpResponse;
+import protocol.HttpResponseFactory;
+import protocol.Protocol;
 
 /**
  * 
  * @author Chandan R. Rupakheti (rupakhcr@clarkson.edu)
  */
-public class NotFound404Response extends HttpResponse {
+public class NotSupported505Response extends HttpResponse {
 
 	/**
 	 * 
 	 */
-	public NotFound404Response(String connection) {
+	public NotSupported505Response(String connection) {
 		// TODO Maybe make these implement a common superclass?
-		super(Protocol.VERSION, Protocol.NOT_FOUND_CODE, Protocol.NOT_FOUND_TEXT, new HashMap<String, String>(), null);
+		super(Protocol.VERSION, Protocol.NOT_SUPPORTED_CODE, Protocol.NOT_FOUND_TEXT, new HashMap<String, String>(), null);
 		// Lets fill up header fields with more information
 		HttpResponseFactory.fillGeneralHeader(this, connection);
 	}

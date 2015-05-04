@@ -26,9 +26,13 @@
  * http://clarkson.edu/~rupakhcr
  */
  
-package protocol;
+package responses;
 
 import java.util.HashMap;
+
+import protocol.HttpResponse;
+import protocol.HttpResponseFactory;
+import protocol.Protocol;
 
 /**
  * 

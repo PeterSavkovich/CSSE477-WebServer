@@ -56,5 +56,7 @@ public interface IHttpRequest {
 	 */
 	public Map<String, String> getHeader();
 	
+	public void setUri(String newUri);
+	
 	public HttpResponse handleRequest(IServer server) throws Exception;
 }

@@ -63,6 +63,7 @@ public class Server implements Runnable, IServer {
 		this.requests = new HashMap<String,Constructor<?>>();
 		this.pluginHandler = new PluginHandler();
 		this.loadClasses();
+		(new Thread(new HttpResponseFactory())).start();
 	}
 
 	private void loadClasses() {

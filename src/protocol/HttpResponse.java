@@ -101,7 +101,7 @@ public class HttpResponse implements IHttpResponse {
 	}
 	
 	public void setBody(String text) {
-		if (this.getFile() != null) {
+		if (this.getFile() == null) {
 			this.body = text;
 		}
 	}

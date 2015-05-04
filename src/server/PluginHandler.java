@@ -102,16 +102,24 @@ public class PluginHandler {
 	}
 	
 	public boolean tryPlugin(String rootContext) {
-		File rootFolder = new File("plugins/");
-		File[] pluginFolders = rootFolder.listFiles();
-		for (File pluginFolder : pluginFolders) {
-			if (pluginFolder.getName() == rootContext) {
-				loadPluginsFromPluginFolder(pluginFolder);
-				return true;
-			}
+		File rootFolder = new File("plugins/"+rootContext+"/");
+		if (!rootFolder.exists() || !rootFolder.isDirectory()) {
+			return false;
 		}
-		return false;
+		loadPluginsFromPluginFolder(rootFolder);
+		return true;
 	}
+	
+	static String stripExtension(String str) {
+		if (str == null)
+			return null;
+		int pos = str.lastIndexOf(".");
+		if (pos == -1)
+			return str;
+		return str.substring(0, pos);
+	}
+
+
 
 	public void loadPluginsFromPluginFolder(File pluginFolder) {
 		File[] configFiles = pluginFolder.listFiles(new FilenameFilter() {
@@ -161,7 +169,7 @@ public class PluginHandler {
 	private static IPlugin loadPluginFromJar(String filename, String filepath) {
 		try {
 			URLClassLoader ucl = new URLClassLoader(new URL[] { new URL(
-					"jar:file:plugins/" + filename + "!/") });
+					"jar:file:plugins/"+stripExtension(filename)+"/" + filename + "!/") }, this.getClass().getClassLoader());
 			JarInputStream jarFile = new JarInputStream(new FileInputStream(
 					filepath));
 			JarEntry entry;
@@ -171,7 +179,10 @@ public class PluginHandler {
 					break;
 				}
 				if (entry.getName().endsWith(".class")) {
-					String classname = entry.getName().replaceAll("/", "\\.");
+//					String[] classnameArr = entry.getName().split("/");
+//					
+//					String classname = classnameArr[classnameArr.length-1];
+					String classname = entry.getName().replaceAll("/", ".");
 					classname = classname.substring(0, classname.length() - 6);
 					try {
 						Class<?> loadedClass = Class.forName(classname, true,
@@ -182,6 +193,7 @@ public class PluginHandler {
 							return plugin;
 						}
 					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
 					}
 				}
 			}
