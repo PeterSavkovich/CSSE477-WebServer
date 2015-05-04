@@ -28,10 +28,24 @@
  
 package protocol;
 
+import java.io.File;
+import java.io.OutputStream;
+import java.util.Map;
+
 /**
  * 
  * @author Chandan R. Rupakheti (rupakhcr@clarkson.edu)
  */
 public interface IHttpResponse {
 
+	public String getVersion();
+	public int getStatus();
+	public String getPhrase();
+	public File getFile();
+	public Map<String, String> getHeader();
+	public void put(String key, String value);
+	public void write(OutputStream outStream) throws Exception;
+	public String toString();
+	public void setBody(String text);
+	public String getBody();
 }
