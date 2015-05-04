@@ -44,10 +44,12 @@ import protocol.ProtocolException;
 public class ConnectionHandler implements Runnable {
 	private Server server;
 	private Socket socket;
+	public PluginHandler pluginHandler;
 	
 	public ConnectionHandler(Server server, Socket socket) {
 		this.server = server;
 		this.socket = socket;
+		this.pluginHandler = new PluginHandler();
 	}
 	
 	/**
@@ -126,7 +128,9 @@ public class ConnectionHandler implements Runnable {
 					response = (HttpResponse) HttpResponseFactory.responses.get(Protocol.NOT_SUPPORTED_CODE).getConstructor(String.class).newInstance(Protocol.CLOSE);
 				}
 				else {
-					response = request.handleRequest(server);
+					// TODO: Get the root context from the request.
+					//response = request.handleRequest(server);
+					response = (HttpResponse) this.pluginHandler.processRequest(request);
 				}
 			}
 			catch(Exception e) {
