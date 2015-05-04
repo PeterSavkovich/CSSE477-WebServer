@@ -23,8 +23,10 @@ package protocol;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Map;
@@ -40,7 +42,7 @@ public class HttpResponse implements IHttpResponse {
 	private String phrase;
 	private Map<String, String> header;
 	private File file;
-
+	private String body;
 	
 	/**
 	 * Constructs a HttpResponse object using supplied parameter
@@ -92,6 +94,16 @@ public class HttpResponse implements IHttpResponse {
 	 */
 	public File getFile() {
 		return file;
+	}
+	
+	public String getBody() {
+		return body;
+	}
+	
+	public void setBody(String text) {
+		if (this.getFile() != null) {
+			this.body = text;
+		}
 	}
 
 	/**
@@ -154,6 +166,18 @@ public class HttpResponse implements IHttpResponse {
 			}
 			// Close the file input stream, we are done reading
 			inStream.close();
+		}
+		
+		if (this.body != null) {
+			ByteArrayInputStream stringInStream = new ByteArrayInputStream(body.getBytes());
+			BufferedInputStream inStream = new BufferedInputStream(stringInStream, Protocol.CHUNK_LENGTH);
+			
+			byte[] buffer = new byte[Protocol.CHUNK_LENGTH];
+			int bytesRead = 0;
+			// While there is some bytes to read from file, read each chunk and send to the socket out stream
+			while((bytesRead = inStream.read(buffer)) != -1) {
+				out.write(buffer, 0, bytesRead);
+			}
 		}
 		
 		// Flush the data so that outStream sends everything through the socket 
