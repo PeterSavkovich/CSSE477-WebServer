@@ -1,6 +1,6 @@
 /*
- * IPlugin.java
- * May 3, 2015
+ * TestPutServlet.java
+ * May 4, 2015
  *
  * Simple Web Server (SWS) for EE407/507 and CS455/555
  * 
@@ -26,19 +26,33 @@
  * http://clarkson.edu/~rupakhcr
  */
  
-package server;
+package plugins;
 
 import protocol.IHttpRequest;
 import protocol.IHttpResponse;
 import protocol.IServer;
+import server.IPlugin;
 
 /**
  * 
  * @author Chandan R. Rupakheti (rupakhcr@clarkson.edu)
  */
-public interface IPlugin {
+public class TestPutServlet implements IPlugin {
 
-	// The one required method is just the ability to process a request.
-	public IHttpResponse processRequest(IHttpRequest request, IServer server) throws Exception;
+	/**
+	 * 
+	 */
+	public TestPutServlet() {
+		// TODO Auto-generated constructor stub
+	}
+
+	/* (non-Javadoc)
+	 * @see server.IPlugin#processRequest(protocol.IHttpRequest, protocol.IServer)
+	 */
+	@Override
+	public IHttpResponse processRequest(IHttpRequest request, IServer server)
+			throws Exception {
+		return request.handleRequest(server);
+	}
 
 }

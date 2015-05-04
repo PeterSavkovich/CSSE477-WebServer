@@ -28,9 +28,15 @@
  
 package plugins;
 
+import java.io.File;
+import java.io.FileWriter;
+
+import protocol.HttpResponse;
+import protocol.HttpResponseFactory;
 import protocol.IHttpRequest;
 import protocol.IHttpResponse;
 import protocol.IServer;
+import protocol.Protocol;
 import server.IPlugin;
 
 /**
@@ -53,7 +59,25 @@ public class TestPostServlet implements IPlugin {
 	public IHttpResponse processRequest(IHttpRequest request, IServer server)
 			throws Exception {
 		System.out.println("TEST POST SERVLET GOT HIT UP");
-		return request.handleRequest(server);
+		HttpResponseFactory.addResponses();
+		String[] pathComponents = request.getUri().split(Protocol.SLASH + "");
+		String uri = Protocol.SLASH + pathComponents[pathComponents.length-1];
+		
+		File file = new File(server.getRootDirectory() + uri);
+		if ((file.exists() && !file.canWrite()) || file.isDirectory()) {
+			return (HttpResponse) HttpResponseFactory.responses.get(Protocol.BAD_REQUEST_CODE).getConstructor(String.class).newInstance(Protocol.CLOSE);
+		} else {
+			try {
+				file.createNewFile();  // Only creates a file if it doesn't exist
+				FileWriter fw = new FileWriter(file, false);
+				fw.write(request.getBody());
+				fw.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+				return (HttpResponse) HttpResponseFactory.responses.get(Protocol.BAD_REQUEST_CODE).getConstructor(File.class, String.class).newInstance(file, Protocol.CLOSE);			}
+		}
+		return (HttpResponse) HttpResponseFactory.responses.get(Protocol.OK_CODE).getConstructor(File.class, String.class).newInstance(file, Protocol.CLOSE);
+		//return request.handleRequest(server);
 	}
 
 }

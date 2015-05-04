@@ -64,6 +64,7 @@ public class PluginHandler {
 		loadup();
 	}
 
+	// Load in all plug-in files at startup.
 	public void loadup() {
 		File rootFolder = new File("plugins/");
 		File[] pluginFolders = rootFolder.listFiles();
@@ -72,6 +73,7 @@ public class PluginHandler {
 		}
 	}
 
+	// For a config file, create the route manager that handles it.
 	public void loadRouteManager(File config, File pluginFolder) {
 		try { 
 			BufferedReader br = new BufferedReader(new FileReader(config));
@@ -84,11 +86,11 @@ public class PluginHandler {
 				if (sp[0].equals("GET")) {
 					System.out.println("Adding that get");
 					prm.addGetRoute(sp[1], plugin);
-				} else if (sp[0] == "POST") {
+				} else if (sp[0].equals("POST")) {
 					prm.addPostRoute(sp[1], plugin);
-				} else if (sp[0] == "PUT") {
+				} else if (sp[0].equals("PUT")) {
 					prm.addPutRoute(sp[1], plugin);
-				} else if (sp[0] == "DELETE") {
+				} else if (sp[0].equals("DELETE")) {
 					prm.addDeleteRoute(sp[1], plugin);
 				} else {
 					prm.addOtherRoute(sp[1], plugin);
@@ -96,11 +98,13 @@ public class PluginHandler {
 			}
 			System.out.println("prm: " + pluginFolder.getName());
 			plugins.put(pluginFolder.getName(), prm);
+			br.close();
 		} catch (Exception e) {
 			// Fuck your mom
 		}
 	}
 	
+	// Search for a plug-in that doesn't exist currently.
 	public boolean tryPlugin(String rootContext) {
 		File rootFolder = new File("plugins/"+rootContext+"/");
 		if (!rootFolder.exists() || !rootFolder.isDirectory()) {
@@ -110,6 +114,7 @@ public class PluginHandler {
 		return true;
 	}
 	
+	// Remove the extension from a file name.
 	static String stripExtension(String str) {
 		if (str == null)
 			return null;
@@ -119,8 +124,7 @@ public class PluginHandler {
 		return str.substring(0, pos);
 	}
 
-
-
+	// Given a plugin folder, load in the config file.
 	public void loadPluginsFromPluginFolder(File pluginFolder) {
 		File[] configFiles = pluginFolder.listFiles(new FilenameFilter() {
 			public boolean accept(File dir, String name) {
@@ -156,17 +160,20 @@ public class PluginHandler {
 		this.plugins.put(rootContext, prm);
 	}
 
+	// TODO: Make this less stupid
 	public static String pullRootContextFromURI(String URI) {
 		String[] splitURI = URI.split("/");
 		return splitURI[1];
 	}
 
+	// TODO: Make this less stupid
 	public static String pullResourceFromURI(String URI) {
 		String[] splitURI = URI.split("/");
 		return splitURI[2];
 	}
 	
-	private static IPlugin loadPluginFromJar(String filename, String filepath) {
+	// Given file information, pulls the Plugin out of the jar.
+	private IPlugin loadPluginFromJar(String filename, String filepath) {
 		try {
 			URLClassLoader ucl = new URLClassLoader(new URL[] { new URL(
 					"jar:file:plugins/"+stripExtension(filename)+"/" + filename + "!/") }, this.getClass().getClassLoader());

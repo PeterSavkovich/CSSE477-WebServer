@@ -59,6 +59,7 @@ public class PluginRouteManager {
 		this.otherRouteHandler = new HashMap<String, IPlugin>();
 	}
 	
+	// Given the resource, handle the request.
 	public IHttpResponse routeRequest(String resource, IHttpRequest request, IServer server) throws Exception {
 		String method = ((HttpRequest)request).getMethod();
 		if (method.equals(Protocol.GET)) {
