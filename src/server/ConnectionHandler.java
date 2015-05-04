@@ -44,12 +44,10 @@ import protocol.ProtocolException;
 public class ConnectionHandler implements Runnable {
 	private Server server;
 	private Socket socket;
-	public PluginHandler pluginHandler;
 	
 	public ConnectionHandler(Server server, Socket socket) {
 		this.server = server;
 		this.socket = socket;
-		this.pluginHandler = new PluginHandler();
 	}
 	
 	/**
@@ -130,7 +128,11 @@ public class ConnectionHandler implements Runnable {
 				else {
 					// TODO: Get the root context from the request.
 					//response = request.handleRequest(server);
-					response = (HttpResponse) this.pluginHandler.processRequest(request, server);
+					if (request.getUri().split("/").length < 3) {
+						response = (HttpResponse) request.handleRequest(server);
+					} else { 
+						response = (HttpResponse) this.server.getPluginHandler().processRequest(request, server);
+					}
 				}
 			}
 			catch(Exception e) {

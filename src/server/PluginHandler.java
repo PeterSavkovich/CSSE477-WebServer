@@ -29,8 +29,10 @@
 package server;
 
 import java.awt.List;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -40,8 +42,10 @@ import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
+import protocol.HttpRequest;
 import protocol.IHttpRequest;
 import protocol.IHttpResponse;
+import protocol.Protocol;
 
 /**
  * 
@@ -50,13 +54,14 @@ import protocol.IHttpResponse;
 public class PluginHandler {
 
 	// Handles a list of the plugins. Will be updated by the watch directory.
-	public Map<String, IPlugin> plugins;
+	public Map<String, PluginRouteManager> plugins;
 
 	/**
 	 * 
 	 */
 	public PluginHandler() {
-		plugins = new HashMap<String, IPlugin>();
+		plugins = new HashMap<String, PluginRouteManager>();
+		loadup();
 	}
 
 	public void loadup() {
@@ -67,6 +72,35 @@ public class PluginHandler {
 		}
 	}
 
+	public void loadRouteManager(File config, File pluginFolder) {
+		try { 
+			BufferedReader br = new BufferedReader(new FileReader(config));
+			String line;
+			PluginRouteManager prm = new PluginRouteManager();
+			while ((line = br.readLine()) != null) {
+				String[] sp = line.split(" ");
+				System.out.println("In the prm maker: " + sp[0]);
+				IPlugin plugin = loadPluginFromJar(sp[2] + ".jar", pluginFolder.getAbsolutePath() + "\\" + sp[2] + ".jar");
+				if (sp[0].equals("GET")) {
+					System.out.println("Adding that get");
+					prm.addGetRoute(sp[1], plugin);
+				} else if (sp[0] == "POST") {
+					prm.addPostRoute(sp[1], plugin);
+				} else if (sp[0] == "PUT") {
+					prm.addPutRoute(sp[1], plugin);
+				} else if (sp[0] == "DELETE") {
+					prm.addDeleteRoute(sp[1], plugin);
+				} else {
+					prm.addOtherRoute(sp[1], plugin);
+				}
+			}
+			System.out.println("prm: " + pluginFolder.getName());
+			plugins.put(pluginFolder.getName(), prm);
+		} catch (Exception e) {
+			// Fuck your mom
+		}
+	}
+	
 	public boolean tryPlugin(String rootContext) {
 		File rootFolder = new File("plugins/");
 		File[] pluginFolders = rootFolder.listFiles();
@@ -80,30 +114,29 @@ public class PluginHandler {
 	}
 
 	public void loadPluginsFromPluginFolder(File pluginFolder) {
-		File[] pluginFiles = pluginFolder.listFiles(new FilenameFilter() {
+		File[] configFiles = pluginFolder.listFiles(new FilenameFilter() {
 			public boolean accept(File dir, String name) {
-				return name.endsWith(".jar");
+				return name.endsWith(".config");
 			}
 		});
 		
-		for (File file : pluginFiles) {
-			IPlugin plugin = loadPluginFromJar(file.getName(),
-											   file.getAbsolutePath());
-			if (plugin != null) {
-				plugins.put(plugin.getRootContext(), plugin);
-			}
+		if (configFiles.length == 1) {
+			loadRouteManager(configFiles[0], pluginFolder);
+		} else {
+			// Probably throw an exception here
 		}
 	}
 	
 	// TODO: Make this exception not stupid.
 	public IHttpResponse processRequest(IHttpRequest request, Server server) throws Exception {
 		String rootContext = pullRootContextFromURI(request.getUri());
-		IPlugin plugin = plugins.get(rootContext);
-		if (plugin != null) {
-			return plugin.processRequest(request, server);
+	    System.out.println(rootContext);
+		PluginRouteManager prm = plugins.get(rootContext);
+		if (prm != null) {
+			return prm.routeRequest(pullResourceFromURI(request.getUri()), request, server);
 		} else {
 			if (tryPlugin(rootContext)) {
-				return plugins.get(rootContext).processRequest(request, server);
+				return plugins.get(rootContext).routeRequest(pullResourceFromURI(request.getUri()), request, server);
 			} else {
 				throw new Exception();
 			}
@@ -111,15 +144,20 @@ public class PluginHandler {
 	}
 
 	// This method is used to update the plugin directory.
-	public void addNewPlugin(String rootContext, IPlugin plugin) {
-		this.plugins.put(rootContext, plugin);
+	public void addNewPlugin(String rootContext, PluginRouteManager prm) {
+		this.plugins.put(rootContext, prm);
 	}
 
 	public static String pullRootContextFromURI(String URI) {
 		String[] splitURI = URI.split("/");
-		return splitURI[3];
+		return splitURI[1];
 	}
 
+	public static String pullResourceFromURI(String URI) {
+		String[] splitURI = URI.split("/");
+		return splitURI[2];
+	}
+	
 	private static IPlugin loadPluginFromJar(String filename, String filepath) {
 		try {
 			URLClassLoader ucl = new URLClassLoader(new URL[] { new URL(

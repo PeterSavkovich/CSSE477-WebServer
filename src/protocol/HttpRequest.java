@@ -50,6 +50,10 @@ public abstract class HttpRequest implements IHttpRequest {
 		this.body = new char[0];
 	}
 
+	public String getMethod() {
+		return this.method;
+	}
+	
 	/**
 	 * The URI of the request object.
 	 * 

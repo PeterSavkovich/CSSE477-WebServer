@@ -43,6 +43,7 @@ public class Server implements Runnable, IServer {
 	private boolean stop;
 	private ServerSocket welcomeSocket;
 	private HashMap<String, Constructor<?>> requests;
+	public PluginHandler pluginHandler;
 	
 	private long connections;
 	private long serviceTime;
@@ -60,6 +61,7 @@ public class Server implements Runnable, IServer {
 		this.serviceTime = 0;
 		this.window = window;
 		this.requests = new HashMap<String,Constructor<?>>();
+		this.pluginHandler = new PluginHandler();
 		this.loadClasses();
 	}
 
@@ -190,5 +192,13 @@ public class Server implements Runnable, IServer {
 		if(this.welcomeSocket != null)
 			return this.welcomeSocket.isClosed();
 		return true;
+	}
+
+	/**
+	 * @return
+	 */
+	public PluginHandler getPluginHandler() {
+		// TODO Auto-generated method stub
+		return this.pluginHandler;
 	}
 }

@@ -47,14 +47,6 @@ public class TestPlugin implements IPlugin {
 	}
 
 	/* (non-Javadoc)
-	 * @see server.IPlugin#getRootContext()
-	 */
-	@Override
-	public String getRootContext() {
-		return "TestPlugin";
-	}
-
-	/* (non-Javadoc)
 	 * @see server.IPlugin#processRequest(protocol.IHttpRequest)
 	 */
 	@Override
