@@ -170,7 +170,7 @@ public class WebServer extends JFrame {
 					JOptionPane.showMessageDialog(WebServer.this, "The web server is still running, try again later.", "Server Still Running Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				
+
 				// Read port number
 				int port = 80;
 				try {

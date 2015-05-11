@@ -28,8 +28,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Map;
+
+import server.FileCondom;
+import server.Server;
 
 /**
  * Represents a response object for HTTP.
@@ -155,11 +159,22 @@ public class HttpResponse implements IHttpResponse {
 		// We are reading a file
 		if(this.getStatus() == Protocol.OK_CODE && file != null) {
 			// Process text documents
-			FileInputStream fileInStream = new FileInputStream(file);
-			BufferedInputStream inStream = new BufferedInputStream(fileInStream, Protocol.CHUNK_LENGTH);
+//			FileInputStream fileInStream = new FileInputStream(file);
+//			BufferedInputStream inStream = new BufferedInputStream(fileInStream, Protocol.CHUNK_LENGTH);
+			byte[] fileBuffer; //= Files.readAllBytes(file.toPath());
+			FileCondom wrappedFile = Server.cache.getIfPresent(file.toPath().toString());
+			if (wrappedFile != null) {
+				fileBuffer = wrappedFile.getFile();
+			} else {
+				fileBuffer = Files.readAllBytes(file.toPath());
+				//Server.cache.put(file.toPath().toString(), new FileCondom(fileBuffer));
+			}
 			
 			byte[] buffer = new byte[Protocol.CHUNK_LENGTH];
 			int bytesRead = 0;
+			ByteArrayInputStream byteInputStream = new ByteArrayInputStream(fileBuffer);
+			BufferedInputStream inStream = new BufferedInputStream(byteInputStream, Protocol.CHUNK_LENGTH);
+
 			// While there is some bytes to read from file, read each chunk and send to the socket out stream
 			while((bytesRead = inStream.read(buffer)) != -1) {
 				out.write(buffer, 0, bytesRead);

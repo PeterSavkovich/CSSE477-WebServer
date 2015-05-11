@@ -168,7 +168,7 @@ public abstract class HttpRequest implements IHttpRequest {
 		
 		int contentLength = 0;
 		try {
-			contentLength = Integer.parseInt(request.header.get(Protocol.CONTENT_LENGTH.toLowerCase()));
+			contentLength = Integer.parseInt(request.header.get(Protocol.CONTENT_LENGTH));
 		}
 		catch(Exception e){}
 		
